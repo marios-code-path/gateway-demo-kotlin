@@ -35,23 +35,28 @@ class GatewayConfiguration {
     internal var baseUri: String? = null
 
     @Bean
-    fun openRoutes(builder: RouteLocatorBuilder): RouteLocator {
-        return builder.routes()
-                .route { predicateSpec ->
-                    predicateSpec.method(HttpMethod.GET)
-                            .and()
-                            .path("/hello")
-                            .uri("$baseUri/hello")
-                }
-                .route { predicateSpec ->
-                    predicateSpec.method(HttpMethod.GET)
-                            .and()
-                            .path("/surprise")
-                            .uri("$baseUri/surprise")
-                }
-                .build()
-    }
+    fun openRoutes(builder: RouteLocatorBuilder): RouteLocator = builder
+            .routes()
+            .route { predicateSpec ->
+                predicateSpec.method(HttpMethod.GET)
+                        .and()
+                        .path("/hello")
+                        .uri("$baseUri/hello")
+            }
+            .route { predicateSpec ->
+                predicateSpec.method(HttpMethod.GET)
+                        .and()
+                        .path("/surprise")
+                        .uri("$baseUri/surprise")
+            }
+            .build()
 
+
+}
+
+@Configuration
+@EnableWebFluxSecurity
+class SecurityConfiguration {
     @Bean
     fun securityConfig(security: ServerHttpSecurity): SecurityWebFilterChain = security
             .authorizeExchange()
@@ -62,20 +67,10 @@ class GatewayConfiguration {
             .build()
 }
 
-
 @Configuration
 @EnableWebFlux
-@EnableWebFluxSecurity
 @Profile("web")
 class SurpriseWebEndpoints {
-    @Bean
-    fun securityConfig(security: ServerHttpSecurity): SecurityWebFilterChain = security
-            .authorizeExchange()
-            .pathMatchers(HttpMethod.GET,
-                    "/**")
-            .permitAll()
-            .and()
-            .build()
 
     @Bean
     fun routerFunctions(): RouterFunction<ServerResponse> = router {
